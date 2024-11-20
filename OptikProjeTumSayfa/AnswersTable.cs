@@ -131,7 +131,7 @@ namespace OptikProjeTumSayfa
                     // Şıklar A, B, C, D, E'yi çiz
                     for (int k = 0; k < numberOfChoices; k++)
                     {
-                        float circleX = currentX + 30 + (k * choiceSpacing); // Şıklar arası boşluk 
+                        float circleX = currentX + 27 + (k * choiceSpacing); // Şıklar arası boşluk  //27 değişkene atanacak soldan 2.3 cm=27 pixel
                         float circleY = currentY + cellHeight / 2;
 
                         cb.SetLineWidth(circleLineThickness); // Yuvarlakların çizgi kalınlığını ayarla

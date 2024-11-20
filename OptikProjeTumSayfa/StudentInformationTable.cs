@@ -14,19 +14,19 @@ namespace OptikProjeTumSayfa
         private float borderThickness = 1f;                                                                                              // Çizgi kalınlığı
         private BaseColor borderColor = BaseColor.BLACK;                                                                                 // Çizgi rengi
         private BaseColor tableBorderColor = BaseColor.BLACK;                                                                            // Çerçeve rengi
-        private float headerHeight = 22f;                                                                                                // Başlık yüksekliği
+        private float headerHeight = 0.6f * 28.35f;                                                                                                // Başlık yüksekliği
         private float topMargin = 3.2f * 28.35f;                                                                                         // 3.2 cm üst kenar boşluğu
         private float leftMargin = 1.3f * 28.35f;                                                                                        // 1.3 cm sol kenar boşluğu   
         private float logotopMargin = 2.8f * 28.35f;                                                                                     // logo 1.8 cm üst kenar boşluğu
         private float logoleftMargin = 2.5f * 28.35f;                                                                                    //logo 2.5 cm sol kenar boşluğu
         private BaseFont headerFont = BaseFont.CreateFont(BaseFont.HELVETICA_BOLD, "Cp1254", BaseFont.NOT_EMBEDDED);                     // Başlık yazı tipi
-        private int headerFontSize = 14;                                                                                                 // Başlık yazı tipi boyutu
+        private int headerFontSize = 10;                                                                                                 // Başlık yazı tipi boyutu
         private BaseFont bodyFont = BaseFont.CreateFont(BaseFont.HELVETICA,"Cp1254", BaseFont.NOT_EMBEDDED);                             // Metin yazı tipi
         private int bodyFontSize = 8;                                                                                                    // Metin yazı tipi boyutu
         private iTextSharp.text.Rectangle pageSize = PageSize.A4;                                                                        // Sayfa boyutu
         BaseFont baseFont = BaseFont.CreateFont(BaseFont.HELVETICA, "Cp1254", BaseFont.NOT_EMBEDDED);
         string[] studentNames = {
-                    "Asağıdaki yerleri büyük harflerle doldurun ve imzalayın","Adı Soyadı", "Öğrenci No", "Tc Kimlik No", "Bölum / Abd"
+                    "Asağıdaki yerleri büyük harflerle doldurun ve imzalayın","ADI SOYADI", "ÖĞRENCİ NO", "TC KİMLİK NO", "BÖLÜM / ABD"
                 };
         int rows = 5;
 
@@ -61,7 +61,7 @@ namespace OptikProjeTumSayfa
                 DrawCenteredText(cb, texts, 12, textColor, true);
 
                 // Masaüstünde bulunan resim yolu
-                string imagePath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\logo.jpg";
+                string imagePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "\\logo.jpg");
 
                 // Resmi PDF'e eklemek için bu fonksiyonu çağırıyoruz
                 AddImageToPdf(cb, imagePath, logoleftMargin, pageSize.Height - logotopMargin, (2f * 28.35f), (2f * 28.35f));
@@ -300,6 +300,8 @@ namespace OptikProjeTumSayfa
         // Resim ekleme fonksiyonu
         private void AddImageToPdf(PdfContentByte cb, string imagePath, float x, float y, float width, float height)
         {
+
+
             // Resim yükle
             iTextSharp.text.Image img = iTextSharp.text.Image.GetInstance(imagePath);
 
