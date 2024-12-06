@@ -45,6 +45,7 @@ namespace OptikProjeTumSayfa
             AddAttentionPdf(filePath);
             AddExamplePdf(filePath);
             AddStudentInformatinTablePdf(filePath);
+            AddDbInformationPdf(filePath);
             MessageBox.Show($"optik form oluşturuldu");
         }
 
@@ -240,6 +241,50 @@ namespace OptikProjeTumSayfa
             // Eski dosyayı silin ve geçici dosyayı asıl dosya yapın
             File.Delete(filePath);
             File.Move(tempFilePath4, filePath);
+
+
+            //MessageBox.Show($"Studentinformationtable, mevcut PDF'ye eklendi: {filePath}");
+
+        }
+
+        private void AddDbInformationPdf(string filePath)
+        {
+            // Geçici bir dosya oluşturacağız, sonra orijinal PDF'nin üzerine yazacağız
+            string tempFilePath4 = Path.Combine(Path.GetDirectoryName(filePath), "temp5.pdf");
+
+            // Mevcut PDF'yi açın ve üstüne ekleme yapmak için PdfStamper kullanın
+            using (PdfReader pdfReader = new PdfReader(filePath))
+            {
+                using (FileStream fs = new FileStream(tempFilePath4, FileMode.Create, FileAccess.Write))
+                {
+                    using (PdfStamper stamper = new PdfStamper(pdfReader, fs))
+                    {
+                        PdfContentByte cb = stamper.GetOverContent(1); // 1. sayfaya içerik ekliyoruz
+
+                        // StudentInformationTable PDF'sini oluşturmak için dosya yolu
+                        string studentInformationTableFilePath = Path.Combine(Path.GetDirectoryName(filePath), "temp_db.pdf");
+
+                        // StudentInformationTable PDF'sini oluştur
+                        DbValuePositioner studentInformationTable = new DbValuePositioner();
+                        studentInformationTable.CreatePdf(studentInformationTableFilePath);
+
+                        // Oluşturulan StudentInformationTable PDF'sini mevcut PDF'ye ekle
+                        using (PdfReader exampleReader = new PdfReader(studentInformationTableFilePath))
+                        {
+                            PdfImportedPage page = stamper.GetImportedPage(exampleReader, 1); // 1. sayfayı al
+                            cb.AddTemplate(page, 0, 0); // Mevcut PDF'nin üstüne ekle
+                            stamper.Close();
+                            exampleReader.Close();
+                        }
+                    }
+                }
+            }
+
+       
+
+                 // Eski dosyayı silin ve geçici dosyayı asıl dosya yapın
+                File.Delete(filePath);
+                File.Move(tempFilePath4, filePath);
 
 
             //MessageBox.Show($"Studentinformationtable, mevcut PDF'ye eklendi: {filePath}");

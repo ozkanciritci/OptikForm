@@ -55,6 +55,7 @@
     <Compile Include="AnswersTable.cs" />
     <Compile Include="Attention.cs" />
     <Compile Include="BookletTypeTable.cs" />
+    <Compile Include="DbValuePositioner.cs" />
     <Compile Include="ExampleMarking.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>

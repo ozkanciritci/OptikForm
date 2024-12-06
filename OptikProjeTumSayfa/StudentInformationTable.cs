@@ -5,8 +5,12 @@ using iTextSharp.text.pdf;
 
 namespace OptikProjeTumSayfa
 {
-    internal class StudentInformationTable
+    public  class StudentInformationTable
     {
+        public static float secondTableHeight = 0.7f * 28.35f; // 0.7 cm = 19.845 pt
+        
+
+        public static int xgetir = 5;
         // Genel değişkenler
         private string tableTitle = "ÖĞRENCİ BİLGİLERİ";                                                                                 // Başlık
         private BaseColor titleBackgroundColor = new BaseColor(173, 216, 230);                                                           // Başlık arka plan rengi
@@ -15,8 +19,8 @@ namespace OptikProjeTumSayfa
         private BaseColor borderColor = BaseColor.BLACK;                                                                                 // Çizgi rengi
         private BaseColor tableBorderColor = BaseColor.BLACK;                                                                            // Çerçeve rengi
         private float headerHeight = 0.6f * 28.35f;                                                                                                // Başlık yüksekliği
-        private float topMargin = 3.2f * 28.35f;                                                                                         // 3.2 cm üst kenar boşluğu
-        private float leftMargin = 1.3f * 28.35f;                                                                                        // 1.3 cm sol kenar boşluğu   
+        public static float topMargin = 3.2f * 28.35f;                                                                                         // 3.2 cm üst kenar boşluğu
+        public static float leftMargin = 1.3f * 28.35f;                                                                                        // 1.3 cm sol kenar boşluğu   
         private float logotopMargin = 2.8f * 28.35f;                                                                                     // logo 1.8 cm üst kenar boşluğu
         private float logoleftMargin = 2.5f * 28.35f;                                                                                    //logo 2.5 cm sol kenar boşluğu
         private BaseFont headerFont = BaseFont.CreateFont(BaseFont.HELVETICA_BOLD, "Cp1254", BaseFont.NOT_EMBEDDED);                     // Başlık yazı tipi
@@ -24,11 +28,17 @@ namespace OptikProjeTumSayfa
         private BaseFont bodyFont = BaseFont.CreateFont(BaseFont.HELVETICA,"Cp1254", BaseFont.NOT_EMBEDDED);                             // Metin yazı tipi
         private int bodyFontSize = 8;                                                                                                    // Metin yazı tipi boyutu
         private iTextSharp.text.Rectangle pageSize = PageSize.A4;                                                                        // Sayfa boyutu
-        BaseFont baseFont = BaseFont.CreateFont(BaseFont.HELVETICA, "Cp1254", BaseFont.NOT_EMBEDDED);
-        string[] studentNames = {
-                    "Asağıdaki yerleri büyük harflerle doldurun ve imzalayın","ADI SOYADI", "ÖĞRENCİ NO", "TC KİMLİK NO", "BÖLÜM / ABD"
+        public static BaseFont baseFont = BaseFont.CreateFont(BaseFont.HELVETICA, "Cp1254", BaseFont.NOT_EMBEDDED);
+        string[] studentInformation = {
+                    "Asağıdaki yerleri büyük harflerle doldurun ve imzalayın","ADI SOYADI        :", "ÖĞRENCİ NO     :", "TC KİMLİK NO    :", "BÖLÜM / ABD     :"
                 };
-        int rows = 5;
+
+    
+        public static int rows = 5;
+        // Tablo ölçüleri (cm'yi noktaya çevirdik)
+        float tableWidth = 12.5f * 28.35f; // 12.5 cm genişlik
+        public static float tableHeight = 3.5f * 28.35f; // 4.1 cm yükseklik
+
 
         // PDF oluşturma fonksiyonu
         public void CreatePdf(string filePath)
@@ -41,13 +51,11 @@ namespace OptikProjeTumSayfa
 
                 PdfContentByte cb = writer.DirectContent;
 
-                // Tablo ölçüleri (cm'yi noktaya çevirdik)
-                float tableWidth = 12.5f * 28.35f; // 12.5 cm genişlik
-                float tableHeight = 3.5f * 28.35f; // 4.1 cm yükseklik
+                
 
                 // İlk tablonun üstten 3.2 cm boşlukla başlayacak
                 float initialY = pageSize.Height - topMargin;
-                DrawCustomTable(cb, leftMargin, initialY, tableWidth, tableHeight, studentNames, rows);
+                DrawCustomTable(cb, leftMargin, initialY, tableWidth, tableHeight, studentInformation, rows);
 
                 // Sağ tarafa 0.7 cm boşluk ve 3 yeni tablo çiz
                 // Sağdaki tablolar, sol taraftaki ilk tablonun başlangıç noktasından 0.5 cm aşağıda başlasın
@@ -67,28 +75,26 @@ namespace OptikProjeTumSayfa
                 AddImageToPdf(cb, imagePath, logoleftMargin, pageSize.Height - logotopMargin, (2f * 28.35f), (2f * 28.35f));
 
 
-
-
-
-
-
-
-
-
-
-
-
                 doc.Close();
             }
         }
+       
+        //public  int xGetir(int sayi)
+        //{
+        //    sayi = 1+ 80;
+        //    return sayi;
+        //}
 
         // Tablo çizme fonksiyonu (parametre olarak öğrenci isimleri ve tablo ölçüleri alıyor)
-        private void DrawCustomTable(PdfContentByte cb, float x, float y, float width, float height, string[] studentNames, int rows)
+        private void DrawCustomTable(PdfContentByte cb, float x, float y, float width, float height, string[] studentInformation, int rows)
         {
+
             // Başlığı ekle
             AddTableHeader(cb, x, y, width, headerHeight, tableTitle);
 
             y -= headerHeight; // Başlık alanı çıkarıldı
+
+
 
             cb.SetLineWidth(borderThickness);
             cb.SetFontAndSize(bodyFont, bodyFontSize);
@@ -105,27 +111,38 @@ namespace OptikProjeTumSayfa
             float cellHeight = height / rows;  // Hücre yüksekliği satır sayısına bağlı
 
             int studentIndex = 0; // Öğrenci bilgileri için sayaç
+           
 
             // İlk sütun satırlara bölünecek ve her satırda ayrı hücreler olacak
             for (int row = 0; row < rows; row++)
             {
                 // Satırın başlangıç Y konumu
                 float currentY = y - (row + 1) * cellHeight;
+               
 
                 // İlk sütunu çiz (satır satır)
                 cb.Rectangle(x, currentY, firstColumnWidth, cellHeight);
                 cb.Stroke();
 
                 // Öğrenci ismini ilk sütuna yaz
-                if (studentIndex < studentNames.Length)
+                if (studentIndex < studentInformation.Length)
                 {
                     cb.BeginText();
                     cb.SetRGBColorFill(0, 0, 0); // Siyah renk
-                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, studentNames[studentIndex], x + 2, currentY + cellHeight / 2 - 5, 0);
+                    cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, studentInformation[studentIndex], x + 2, currentY + cellHeight / 2 - 5, 0);
                     cb.EndText();
                     studentIndex++;
+
+                   
                 }
             }
+
+           
+
+            
+          
+
+
 
             // İkinci sütunu tek bir hücre olarak çiz (tüm satırları kapsayacak)
             cb.Rectangle(x + firstColumnWidth, y - height, secondColumnWidth, height);
@@ -147,18 +164,20 @@ namespace OptikProjeTumSayfa
             y -= (height + secondTableSpacing);
 
             // İkinci tabloyu çiz (yüksekliği 0.7 cm)
-            float secondTableHeight = 0.7f * 28.35f; // 0.7 cm = 19.845 pt
+            
             cb.Rectangle(x, y - secondTableHeight, width, secondTableHeight);
             cb.Stroke();  // Tabloyu çiz
 
             // İkinci tabloya "SINAV ADI" yazısını ekle
             cb.BeginText();
             cb.SetFontAndSize(baseFont, 8);  // Yazı fontu ve boyutu ayarla
+             
             cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, "SINAV ADI", x + 5, y - (secondTableHeight / 2) - 5, 0);  // Yazıyı tablonun solunda hizala
             cb.EndText();
+            
 
-            // İkinci tabloya ait y koordinatları
-            float secondTableTopY = y;  // Tablo üst kısmı
+        // İkinci tabloya ait y koordinatları
+        float secondTableTopY = y;  // Tablo üst kısmı
             float secondTableBottomY = y - secondTableHeight;  // Tablo alt kısmı
 
             // Soldan 2.8 cm uzaklık hesaplaması (1 cm = 28.35 pt)
