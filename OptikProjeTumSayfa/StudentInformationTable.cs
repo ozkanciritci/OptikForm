@@ -18,9 +18,9 @@ namespace OptikProjeTumSayfa
         private float borderThickness = 1f;                                                                                              // Çizgi kalınlığı
         private BaseColor borderColor = BaseColor.BLACK;                                                                                 // Çizgi rengi
         private BaseColor tableBorderColor = BaseColor.BLACK;                                                                            // Çerçeve rengi
-        private float headerHeight = 0.6f * 28.35f;                                                                                                // Başlık yüksekliği
-        public static float topMargin = 3.2f * 28.35f;                                                                                         // 3.2 cm üst kenar boşluğu
-        public static float leftMargin = 1.3f * 28.35f;                                                                                        // 1.3 cm sol kenar boşluğu   
+                                                                                                                                        // Başlık yüksekliği
+        public static float topMargin = 3.2f * 28.35f;                                                                                   // 3.2 cm üst kenar boşluğu
+        public static float leftMargin = 1.3f * 28.35f;                                                                                  // 1.3 cm sol kenar boşluğu   
         private float logotopMargin = 2.8f * 28.35f;                                                                                     // logo 1.8 cm üst kenar boşluğu
         private float logoleftMargin = 2.5f * 28.35f;                                                                                    //logo 2.5 cm sol kenar boşluğu
         private BaseFont headerFont = BaseFont.CreateFont(BaseFont.HELVETICA_BOLD, "Cp1254", BaseFont.NOT_EMBEDDED);                     // Başlık yazı tipi
@@ -36,8 +36,15 @@ namespace OptikProjeTumSayfa
     
         public static int rows = 5;
         // Tablo ölçüleri (cm'yi noktaya çevirdik)
-        float tableWidth = 12.5f * 28.35f; // 12.5 cm genişlik
+        public float tableWidth = 12.5f * 28.35f; // 12.5 cm genişlik
         public static float tableHeight = 3.5f * 28.35f; // 4.1 cm yükseklik
+        public float secondTableSpacing = 0.2f * 28.35f;  // 0.2 cm = 5.67 pt
+        public float headerHeight = 0.6f * 28.35f;
+        public float lineX = 4.2f * 28.35f;
+        public float rightTablesWidth = 5.2f * 28.35f;  // 5.2 cm genişlik
+        public float rightTablesHeight = 0.8f * 28.35f;  // 0.8 cm yükseklik
+        public float rightTablesSpacing = 1.425f * 28.35f;  // 1.5 cm boşluk
+        public float rightTablesTextOffset = 12f; // Tablo ile metin arasındaki mesafe (12 pt = yaklaşık 0.42 cm)
 
 
         // PDF oluşturma fonksiyonu
@@ -160,7 +167,7 @@ namespace OptikProjeTumSayfa
 
 
             // İkinci tabloyu çizmek için 0.2 cm boşluk bırak
-            float secondTableSpacing = 0.2f * 28.35f;  // 0.2 cm = 5.67 pt
+           
             y -= (height + secondTableSpacing);
 
             // İkinci tabloyu çiz (yüksekliği 0.7 cm)
@@ -181,7 +188,7 @@ namespace OptikProjeTumSayfa
             float secondTableBottomY = y - secondTableHeight;  // Tablo alt kısmı
 
             // Soldan 2.8 cm uzaklık hesaplaması (1 cm = 28.35 pt)
-            float lineX = 4.2f * 28.35f;  // Satır çizgisinin x koordinatı
+              // Satır çizgisinin x koordinatı
 
             // İkinci tabloya satır ekle (2.8 cm uzaklıkta)
             cb.MoveTo(lineX, secondTableTopY);  // Çizgiyi başlat (2. tablo üstü)
@@ -217,10 +224,7 @@ namespace OptikProjeTumSayfa
         // Sağ tarafta 3 tablo çizme fonksiyonu
         private void DrawRightTables(PdfContentByte cb, float x, float y)
         {
-            float tableWidth = 5.2f * 28.35f;  // 5.2 cm genişlik
-            float tableHeight = 0.8f * 28.35f;  // 0.8 cm yükseklik
-            float spacing = 1.5f * 28.35f;  // 1.5 cm boşluk
-            float textOffset = 12f; // Tablo ile metin arasındaki mesafe (12 pt = yaklaşık 0.42 cm)
+            
 
             // Tabloların başlıkları
             string[] titles = { "BÖLÜMÜ", "SALON NO", "SIRA NO" };
@@ -231,15 +235,15 @@ namespace OptikProjeTumSayfa
                 // Tablo başlığını ekle
                 cb.BeginText();
                 cb.SetFontAndSize(baseFont, 10);  // Yazı fontu ve boyutu ayarla
-                cb.ShowTextAligned(PdfContentByte.ALIGN_CENTER, titles[i], x + tableWidth / 2, y + textOffset, 0);  // Metni tablo üstüne ortala
+                cb.ShowTextAligned(PdfContentByte.ALIGN_CENTER, titles[i], x + rightTablesWidth / 2, y + rightTablesTextOffset, 0);  // Metni tablo üstüne ortala
                 cb.EndText();
 
                 // Tabloyu çiz
-                cb.Rectangle(x, y - tableHeight, tableWidth, tableHeight);
+                cb.Rectangle(x, y - rightTablesHeight, rightTablesWidth, rightTablesHeight);
                 cb.Stroke();
 
                 // Bir sonraki tabloya geçmeden önce Y koordinatını güncelle
-                y -= (tableHeight + spacing);
+                y -= (rightTablesHeight + rightTablesSpacing);
             }
         }
 
