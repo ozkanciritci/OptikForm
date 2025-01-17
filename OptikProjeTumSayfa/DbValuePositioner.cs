@@ -14,11 +14,14 @@ namespace OptikProjeTumSayfa
         private string sınavAdi;
         private string sınavTarih;
         private readonly iTextSharp.text.Rectangle pageSize = PageSize.A4;
+        private int StudentID = 3; // Varsayılan bir öğrenci ID'si, gerektiğinde değiştirebilirsiniz.
+
 
         private int studentIndexData = 0; // Öğrenci bilgileri için sayaç
 
         // Sabit değerler
         private float cellHeight; // Her bir hücrenin yüksekliği
+        
 
         // Constructor
         public DbValuePositioner()
@@ -34,29 +37,41 @@ namespace OptikProjeTumSayfa
             {
                 studentsInformationDataBase = FetchStudentData(connection);
                 titles = FetchTitles(connection);
-                sınavAdi = FetchSingleValue(connection, "SELECT ExamName FROM ExamDetails LIMIT 1;");
-                sınavTarih = FetchSingleValue(connection, "SELECT ExamDate FROM ExamDetails LIMIT 1;");
+                sınavAdi = FetchSingleValue(connection, "SELECT ExamName FROM examdetails ORDER BY ID DESC LIMIT 1;");
+                sınavTarih = FetchSingleValue(connection, "SELECT ExamDate FROM examdetails ORDER BY ID DESC LIMIT 1;");
+
             }
         }
 
         private string[] FetchStudentData(MySqlConnection connection)
         {
             List<string> studentData = new List<string>();
-            string query = @"SELECT Name, StudentNumber, TCKN, DepartmentName FROM students 
-                     LEFT JOIN departments ON students.DepartmentID = departments.DepartmentID 
-                     WHERE students.StudentID = 11;";
+            string query = @"
+            SELECT s.Name, 
+                   s.StudentNumber, 
+                   s.TCKN, 
+                   d.DepartmentName 
+            FROM students s
+            LEFT JOIN departments d ON s.DepartmentID = d.DepartmentID
+            WHERE s.StudentID = @StudentID;";
+
 
             using (MySqlCommand command = new MySqlCommand(query, connection))
-            using (MySqlDataReader reader = command.ExecuteReader())
             {
-                while (reader.Read())
+                command.Parameters.AddWithValue("@StudentID", StudentID); // Kullanıcı ID'sini parametre olarak ekleyin
+
+                using (MySqlDataReader reader = command.ExecuteReader())
                 {
-                    studentData.Add(reader.GetString("Name")); // Ad Soyad
-                    studentData.Add(reader.GetString("StudentNumber")); // Öğrenci No
-                    studentData.Add(reader.GetString("TCKN")); // TC Kimlik No
-                    studentData.Add(reader.GetString("DepartmentName")); // Bölüm
+                    while (reader.Read())
+                    {
+                        studentData.Add(reader.GetString("Name")); // Ad Soyad
+                        studentData.Add(reader.GetString("StudentNumber")); // Öğrenci No
+                        studentData.Add(reader.GetString("TCKN")); // TC Kimlik No
+                        studentData.Add(reader.GetString("DepartmentName")); // Bölüm
+                    }
                 }
             }
+
 
             return studentData.ToArray();
         }
@@ -64,19 +79,34 @@ namespace OptikProjeTumSayfa
         private string[] FetchTitles(MySqlConnection connection)
         {
             List<string> titleData = new List<string>();
-            string query = "SELECT Title FROM ExamTitles LIMIT 3;";
+
+            string query = @"
+        SELECT e.DepartmentName AS ExamDepartment, 
+               e.RoomNumber AS ExamRoom, 
+               e.SeatNumber AS ExamSeat
+        FROM examtitles e
+        JOIN students s ON e.ID = s.ExampleTitleID
+        WHERE s.StudentID = @StudentID;";  // ExampleTitleID ile eşleşen verileri getir
 
             using (MySqlCommand command = new MySqlCommand(query, connection))
-            using (MySqlDataReader reader = command.ExecuteReader())
             {
-                while (reader.Read())
+                command.Parameters.AddWithValue("@StudentID", StudentID); // Global StudentID değişkenini kullan
+
+                using (MySqlDataReader reader = command.ExecuteReader())
                 {
-                    titleData.Add(reader.GetString("Title"));
+                    while (reader.Read())
+                    {
+                        titleData.Add(reader.GetString("ExamDepartment")); // Bölüm
+                        titleData.Add(reader.GetInt32("ExamRoom").ToString()); // Salon No
+                        titleData.Add(reader.GetInt32("ExamSeat").ToString()); // Sıra No
+                    }
                 }
             }
 
             return titleData.ToArray();
         }
+
+
 
         private string FetchSingleValue(MySqlConnection connection, string query)
         {
