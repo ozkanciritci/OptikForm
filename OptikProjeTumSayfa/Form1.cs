@@ -5,15 +5,31 @@ using System.Windows.Forms;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
 using System.IO;
+using System.Collections.Generic;
 
 
 namespace OptikProjeTumSayfa
 {
     public partial class Form1 : Form
     {
+
+        private DataGridView dgvStudents;
+        private List<int> selectedStudentIds = new List<int>();
+
+
+
+
+
         public Form1()
         {
+
+
+
             InitializeComponent();
+            SetupDataGridView();
+            LoadStudents();
+            this.Load += Form1_Load;
+
             this.Text = "PDF Tablo Oluşturucu";
             this.Width = 600;
             this.Height = 400;
@@ -26,6 +42,46 @@ namespace OptikProjeTumSayfa
 
             this.Controls.Add(btnCreatePdf);
         }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            // Formun genişliğini DataGridView'in genişliğine göre ayarla
+            this.Width = dgvStudents.Width + 40;  // 40 ekleyerek margin bırakıyoruz
+            this.Height = dgvStudents.Height + 100; // 100 ekleyerek butonlara yer bırakıyoruz
+
+            // Minimum boyutu belirleyerek kullanıcı küçültmesini engelle
+            this.MinimumSize = new Size(this.Width, this.Height);
+        }
+
+
+
+        private void SetupDataGridView()
+        {
+            dgvStudents = new DataGridView
+            {
+                Location = new Point(10, 50),
+                Width = 1000,  // Daha geniş yaparak tüm bilgileri sığdır
+                Height = 300,
+                AllowUserToAddRows = false,
+                ReadOnly = true,
+                SelectionMode = DataGridViewSelectionMode.FullRowSelect,
+                MultiSelect = true,
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill // Sütunları otomatik genişlet
+            };
+
+            dgvStudents.Columns.Add("ID", "Öğrenci ID");
+            dgvStudents.Columns.Add("Name", "Öğrenci Adı");
+            dgvStudents.Columns.Add("StudentNumber", "Öğrenci No");
+            dgvStudents.Columns.Add("TCKN", "T.C. Kimlik No");
+            dgvStudents.Columns.Add("Department", "Bölüm");
+            dgvStudents.Columns.Add("ExamName", "Sınav Adı");
+            dgvStudents.Columns.Add("ExamDate", "Sınav Tarihi");
+            dgvStudents.Columns.Add("Room", "Sınav Salonu");
+            dgvStudents.Columns.Add("Seat", "Sınav Sırası");
+
+            this.Controls.Add(dgvStudents);
+        }
+
 
         private void button1_Click(object sender, EventArgs e)
         {
@@ -48,6 +104,37 @@ namespace OptikProjeTumSayfa
             AddDbInformationPdf(filePath);
             MessageBox.Show($"optik form oluşturuldu");
         }
+
+
+        private void LoadStudents()
+        {
+            DbConnection db = new DbConnection();
+            List<(int, string, string, string, string, string, string, string, string)> students = db.GetStudents();
+
+            dgvStudents.Rows.Clear();
+            foreach (var student in students)
+            {
+                dgvStudents.Rows.Add(
+                    student.Item1,  // StudentID
+                    student.Item2,  // Name
+                    student.Item3,  // StudentNumber
+                    student.Item4,  // TCKN
+                    student.Item5,  // DepartmentName
+                    student.Item6,  // ExamName
+                    student.Item7,  // ExamDate
+                    student.Item8,  // RoomNumber
+                    student.Item9   // SeatNumber
+                );
+            }
+
+            if (students.Count == 0)
+            {
+                MessageBox.Show("Veritabanında öğrenci bulunamadı!");
+            }
+        }
+
+
+
 
 
 

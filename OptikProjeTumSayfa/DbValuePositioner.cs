@@ -14,7 +14,7 @@ namespace OptikProjeTumSayfa
         private string sınavAdi;
         private string sınavTarih;
         private readonly iTextSharp.text.Rectangle pageSize = PageSize.A4;
-        private int StudentID = 3; // Varsayılan bir öğrenci ID'si, gerektiğinde değiştirebilirsiniz.
+        private int StudentID = 6; // Varsayılan bir öğrenci ID'si, gerektiğinde değiştirebilirsiniz.
 
 
         private int studentIndexData = 0; // Öğrenci bilgileri için sayaç
@@ -35,13 +35,23 @@ namespace OptikProjeTumSayfa
             DbConnection db = new DbConnection();
             using (MySqlConnection connection = db.GetConnection())
             {
+                Console.WriteLine("Kullanılan StudentID: " + StudentID); // Debug için
+
                 studentsInformationDataBase = FetchStudentData(connection);
                 titles = FetchTitles(connection);
-                sınavAdi = FetchSingleValue(connection, "SELECT ExamName FROM examdetails ORDER BY ID DESC LIMIT 1;");
-                sınavTarih = FetchSingleValue(connection, "SELECT ExamDate FROM examdetails ORDER BY ID DESC LIMIT 1;");
 
+                sınavAdi = FetchSingleValue(connection, @"
+            SELECT ExamName 
+            FROM examdetails 
+            WHERE ID = (SELECT ExampleDetailsID FROM students WHERE StudentID = @StudentID);");
+
+                sınavTarih = FetchSingleValue(connection, @"
+            SELECT ExamDate 
+            FROM examdetails 
+            WHERE ID = (SELECT ExampleDetailsID FROM students WHERE StudentID = @StudentID);");
             }
         }
+
 
         private string[] FetchStudentData(MySqlConnection connection)
         {
@@ -81,12 +91,12 @@ namespace OptikProjeTumSayfa
             List<string> titleData = new List<string>();
 
             string query = @"
-        SELECT e.DepartmentName AS ExamDepartment, 
-               e.RoomNumber AS ExamRoom, 
-               e.SeatNumber AS ExamSeat
-        FROM examtitles e
-        JOIN students s ON e.ID = s.ExampleTitleID
-        WHERE s.StudentID = @StudentID;";  // ExampleTitleID ile eşleşen verileri getir
+            SELECT e.DepartmentName AS ExamDepartment, 
+                   e.RoomNumber AS ExamRoom, 
+                   e.SeatNumber AS ExamSeat
+            FROM examtitles e
+            JOIN students s ON e.ID = s.ExampleTitleID
+            WHERE s.StudentID = @StudentID;";  // ExampleTitleID ile eşleşen verileri getir
 
             using (MySqlCommand command = new MySqlCommand(query, connection))
             {
@@ -112,10 +122,13 @@ namespace OptikProjeTumSayfa
         {
             using (MySqlCommand command = new MySqlCommand(query, connection))
             {
+                command.Parameters.AddWithValue("@StudentID", StudentID); // Eksik parametreyi ekledik
+
                 object result = command.ExecuteScalar();
                 return result != null ? result.ToString() : string.Empty;
             }
         }
+
 
         public void CreatePdf(string filePath)
         {
