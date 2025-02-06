@@ -6,6 +6,7 @@ using iTextSharp.text;
 using iTextSharp.text.pdf;
 using System.IO;
 using System.Collections.Generic;
+using MySql.Data.MySqlClient;
 
 
 namespace OptikProjeTumSayfa
@@ -59,15 +60,19 @@ namespace OptikProjeTumSayfa
         {
             dgvStudents = new DataGridView
             {
+                SelectionMode = DataGridViewSelectionMode.FullRowSelect,
+                MultiSelect = false, 
                 Location = new Point(10, 50),
-                Width = 1000,  // Daha geniş yaparak tüm bilgileri sığdır
+                Width = 1000, 
                 Height = 300,
                 AllowUserToAddRows = false,
                 ReadOnly = true,
-                SelectionMode = DataGridViewSelectionMode.FullRowSelect,
-                MultiSelect = true,
-                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill // Sütunları otomatik genişlet
+                
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill 
             };
+
+            dgvStudents.CellMouseClick += DgvStudents_CellMouseClick;
+            dgvStudents.CellFormatting += DgvStudents_CellFormatting;
 
             dgvStudents.Columns.Add("ID", "Öğrenci ID");
             dgvStudents.Columns.Add("Name", "Öğrenci Adı");
@@ -81,29 +86,126 @@ namespace OptikProjeTumSayfa
 
             this.Controls.Add(dgvStudents);
         }
+        private void DgvStudents_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            if (e.RowIndex >= 0) // Header'a tıklamaları filtrele
+            {
+                DataGridViewRow row = dgvStudents.Rows[e.RowIndex];
+                int id = Convert.ToInt32(row.Cells["ID"].Value);
+
+                // Seçimi toggle et
+                if (selectedStudentIds.Contains(id))
+                {
+                    selectedStudentIds.Remove(id);
+                    row.Selected = false;
+                }
+                else
+                {
+                    selectedStudentIds.Add(id);
+                    row.Selected = true;
+                }
+
+                // Konsola yazdır
+                Console.WriteLine("Seçilen ID'ler: " + string.Join(", ", selectedStudentIds));
+
+                // Görsel güncelleme için
+                dgvStudents.Invalidate();
+            }
+        }
+
+
+
+
+
+        private void DgvStudents_SelectionChanged(object sender, EventArgs e)
+        {
+            selectedStudentIds.Clear();
+            foreach (DataGridViewRow row in dgvStudents.SelectedRows)
+            {
+                if (row.Cells["ID"].Value != null)
+                {
+                    int id = Convert.ToInt32(row.Cells["ID"].Value);
+                    selectedStudentIds.Add(id);
+                }
+            }
+            dgvStudents.Invalidate(); // Hücreleri yeniden çiz
+        }
+
+
+        private void DgvStudents_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+        {
+            if (e.RowIndex >= 0)
+            {
+                DataGridViewRow row = dgvStudents.Rows[e.RowIndex];
+                int id = Convert.ToInt32(row.Cells["ID"].Value);
+
+                // Sadece selectedStudentIds listesindekileri mavi yap
+                if (selectedStudentIds.Contains(id))
+                {
+                    row.DefaultCellStyle.BackColor = Color.Blue;
+                    row.DefaultCellStyle.ForeColor = Color.White;
+                }
+                else
+                {
+                    row.DefaultCellStyle.BackColor = Color.White;
+                    row.DefaultCellStyle.ForeColor = Color.Black;
+                }
+            }
+        }
+
+
+
+
 
 
         private void button1_Click(object sender, EventArgs e)
         {
-            // Tek bir PDF dosyası için dosya yolu
-            string filePath = @"C:\Users\Ozkan\Desktop\OptikForm.pdf";
+            if (selectedStudentIds.Count == 0)
+            {
+                MessageBox.Show("Lütfen en az bir öğrenci seçin!");
+                return;
+            }
 
-            // İlk olarak AnswersTable tablosunu oluştur
-            AnswersTable answersTable = new AnswersTable();
-            answersTable.CreatePdf(filePath);
-            //MessageBox.Show($"AnswersTable PDF oluşturuldu: {filePath}");
+            DbConnection db = new DbConnection();
 
+            foreach (int studentId in selectedStudentIds)
+            {
+                // Veritabanından öğrenci adını ve soyadını al
+                string studentName = GetStudentNameById(db, studentId);
+                string fileName = $"{studentName.Replace(" ", "_")}.pdf"; // Dosya adı: Ad_Soyad.pdf
+                string filePath = Path.Combine(@"C:\Users\Ozkan\Desktop\", fileName);
 
+                // Yeni bir DbValuePositioner nesnesi oluştur ve PDF üret
+                DbValuePositioner studentPdf = new DbValuePositioner(studentId);
+                studentPdf.CreatePdf(filePath);
 
-            // Şimdi mevcut PDF'yi açıp üzerine  ekle
-            AddNumberedTableToExistingPdf(filePath);
-            AddNotTakeExamPdf(filePath);
-            AddAttentionPdf(filePath);
-            AddExamplePdf(filePath);
-            AddStudentInformatinTablePdf(filePath);
-            AddDbInformationPdf(filePath);
-            MessageBox.Show($"optik form oluşturuldu");
+                // Mevcut PDF'ye eklemeleri yap
+                AddNumberedTableToExistingPdf(filePath);
+                AddNotTakeExamPdf(filePath);
+                AddAttentionPdf(filePath);
+                AddExamplePdf(filePath);
+                AddStudentInformatinTablePdf(filePath);
+                AddDbInformationPdf(filePath);
+            }
+
+            MessageBox.Show($"Tüm seçilen öğrenciler için PDF'ler oluşturuldu!");
         }
+
+        private string GetStudentNameById(DbConnection db, int studentId)
+        {
+            using (MySqlConnection connection = db.GetConnection())
+            {
+                string query = "SELECT Name FROM students WHERE StudentID = @StudentID";
+                using (MySqlCommand command = new MySqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@StudentID", studentId);
+                    object result = command.ExecuteScalar();
+                    return result != null ? result.ToString() : "Unknown";
+                }
+            }
+        }
+
+
 
 
         private void LoadStudents()
@@ -378,7 +480,10 @@ namespace OptikProjeTumSayfa
 
         }
 
+        private void Form1_Load_1(object sender, EventArgs e)
+        {
 
+        }
     }
 
 }
