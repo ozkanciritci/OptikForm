@@ -61,14 +61,14 @@ namespace OptikProjeTumSayfa
             dgvStudents = new DataGridView
             {
                 SelectionMode = DataGridViewSelectionMode.FullRowSelect,
-                MultiSelect = false, 
+                MultiSelect = false,
                 Location = new Point(10, 50),
-                Width = 1000, 
+                Width = 1000,
                 Height = 300,
                 AllowUserToAddRows = false,
                 ReadOnly = true,
-                
-                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill 
+
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
             };
 
             dgvStudents.CellMouseClick += DgvStudents_CellMouseClick;
@@ -170,7 +170,6 @@ namespace OptikProjeTumSayfa
 
             foreach (int studentId in selectedStudentIds)
             {
-                // Veritabanından öğrenci adını ve soyadını al
                 string studentName = GetStudentNameById(db, studentId);
                 string fileName = $"{studentName.Replace(" ", "_")}.pdf"; // Dosya adı: Ad_Soyad.pdf
                 string filePath = Path.Combine(@"C:\Users\Ozkan\Desktop\", fileName);
@@ -179,17 +178,19 @@ namespace OptikProjeTumSayfa
                 DbValuePositioner studentPdf = new DbValuePositioner(studentId);
                 studentPdf.CreatePdf(filePath);
 
-                // Mevcut PDF'ye eklemeleri yap
+                // 📌 **PDF'ye eklemeleri yapıyoruz**
                 AddNumberedTableToExistingPdf(filePath);
                 AddNotTakeExamPdf(filePath);
                 AddAttentionPdf(filePath);
                 AddExamplePdf(filePath);
                 AddStudentInformatinTablePdf(filePath);
                 AddDbInformationPdf(filePath);
+                AddAnswersTableToPdf(filePath); // **Yeni AnswersTable'ı ekledik**
             }
 
             MessageBox.Show($"Tüm seçilen öğrenciler için PDF'ler oluşturuldu!");
         }
+
 
         private string GetStudentNameById(DbConnection db, int studentId)
         {
@@ -273,7 +274,7 @@ namespace OptikProjeTumSayfa
             // Eski dosyayı silin ve geçici dosyayı asıl dosya yapın
             File.Delete(filePath);
             File.Move(tempFilePath, filePath);
-           // MessageBox.Show($"NumberedTable, mevcut PDF'ye eklendi: {filePath}");
+            // MessageBox.Show($"NumberedTable, mevcut PDF'ye eklendi: {filePath}");
         }
 
         private void AddNotTakeExamPdf(string filePath)
@@ -395,6 +396,42 @@ namespace OptikProjeTumSayfa
 
         }
 
+        private void AddAnswersTableToPdf(string filePath)
+        {
+            // Geçici bir dosya oluşturacağız, sonra orijinal PDF'nin üzerine yazacağız
+            string tempFilePath = Path.Combine(Path.GetDirectoryName(filePath), "temp_answers_table.pdf");
+
+            // Mevcut PDF'yi açın ve üstüne ekleme yapmak için PdfStamper kullanın
+            using (PdfReader pdfReader = new PdfReader(filePath))
+            {
+                using (FileStream fs = new FileStream(tempFilePath, FileMode.Create, FileAccess.Write))
+                {
+                    PdfStamper stamper = new PdfStamper(pdfReader, fs);
+                    PdfContentByte cb = stamper.GetOverContent(1); // 1. sayfaya içerik ekliyoruz
+
+                    // 📌 AnswersTable PDF'sini oluştur
+                    string answersTableFilePath = Path.Combine(Path.GetDirectoryName(filePath), "temp_AnswersTable.pdf");
+
+                    AnswersTable answersTable = new AnswersTable();
+                    answersTable.CreatePdf(answersTableFilePath); // **Doğru fonksiyon adını kullanıyoruz**
+
+                    // Oluşturulan AnswersTable PDF'sini mevcut PDF'ye ekliyoruz
+                    PdfReader answersTableReader = new PdfReader(answersTableFilePath);
+                    PdfImportedPage page = stamper.GetImportedPage(answersTableReader, 1); // 1. sayfayı al
+
+                    cb.AddTemplate(page, 0, 0); // Mevcut PDF'nin üstüne ekle
+
+                    stamper.Close();
+                    answersTableReader.Close();
+                }
+            }
+
+            // Eski dosyayı silin ve geçici dosyayı asıl dosya yapın
+            File.Delete(filePath);
+            File.Move(tempFilePath, filePath);
+        }
+
+
         private void AddStudentInformatinTablePdf(string filePath)
         {
             // Geçici bir dosya oluşturacağız, sonra orijinal PDF'nin üzerine yazacağız
@@ -469,11 +506,13 @@ namespace OptikProjeTumSayfa
                 }
             }
 
-       
 
-                 // Eski dosyayı silin ve geçici dosyayı asıl dosya yapın
-                File.Delete(filePath);
-                File.Move(tempFilePath4, filePath);
+
+
+
+            // Eski dosyayı silin ve geçici dosyayı asıl dosya yapın
+            File.Delete(filePath);
+            File.Move(tempFilePath4, filePath);
 
 
             //MessageBox.Show($"Studentinformationtable, mevcut PDF'ye eklendi: {filePath}");
