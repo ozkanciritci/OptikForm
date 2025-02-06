@@ -46,109 +46,85 @@ namespace OptikProjeTumSayfa
 
         public void DrawTable(PdfContentByte cb, float x, float y, float width, float height)
         {
-            float remainingHeight = height - titleHeight; // Kalan yükseklik
-            float cellHeight = remainingHeight / leftrows; // Her bir hücre için kalan yükseklik
+            float remainingHeight = height - titleHeight;
+            float cellHeight = remainingHeight / leftrows;
 
-            // Başlığı ekle
-            // Sol başlığı ekle (KİTAPÇIK TÜRÜ)
+            // 📌 **Dış Kenarlıkları Tek Seferde Çiziyoruz**
+            cb.SetLineWidth(borderLineWidth);
+            cb.Rectangle(x, y - height, width, height);
+            cb.Stroke();
+
+            // Başlıkları çiz
             float leftTitleX = x;
             AddTitle(cb, leftTitleX, y, columnDistance, titleHeight, tableNames["leftTitle"][0], tableNames["leftTitle"][1]);
 
-            // Sağ başlığı ekle (GOZETMEN PARAF)
             float rightTitleX = x + columnDistance;
             AddTitle(cb, rightTitleX, y, width - columnDistance, titleHeight, tableNames["rightTitle"][0], tableNames["rightTitle"][1]);
 
+            // 🔹 **Başlıkların Altına Siyah Çizgi Ekliyoruz**
+            float bottomTitleY = y - titleHeight;
+            cb.SetLineWidth(lineWidth);
+            cb.MoveTo(x, bottomTitleY);
+            cb.LineTo(x + width, bottomTitleY);
+            cb.Stroke(); // 📌 **Bu Çizgi Mavi Alan ile Beyaz Alanı Ayırıyor!**
 
-
-
-            // Kenarlıklar için çizgi kalınlığını global değişkenle ayarla
+            // 🔹 **İç Çizgileri Çiz**
             cb.SetLineWidth(lineWidth);
             BaseFont bf = BaseFont.CreateFont(BaseFont.HELVETICA, "Cp1254", BaseFont.NOT_EMBEDDED);
-            cb.SetFontAndSize(bf, circleFontSize); // Yazı tipi boyutunu artırdık
+            cb.SetFontAndSize(bf, circleFontSize);
 
-            // Tablo hücrelerini çiz (beyaz arka plan, satır çizgileri yok)
-            y -= titleHeight; // Yüksekliği başlık yüksekliği kadar azalt
+            y -= titleHeight;
 
-            // Sol kenarlık
-            cb.SetLineWidth(borderLineWidth);
-            cb.MoveTo(x, y);
-            cb.LineTo(x, y - height + titleHeight);
-            cb.Stroke();
-
-            // Sağ kenarlık
-            cb.MoveTo(x + width, y);
-            cb.LineTo(x + width, y - height + titleHeight);
-            cb.Stroke();
-
-            // Üst kenarlık
-            cb.MoveTo(x, y);
-            cb.LineTo(x + width, y);
-            cb.Stroke();
-
-            // Sol köşeden 1.4 cm uzaklıkta dikey bir çizgi ekle
+            // 🔹 **Orta Çizgi (Sol ve Sağ Tabloyu Ayıran Çizgi)**
             float lineX = x + columnDistance;
-            cb.SetLineWidth(lineWidth);
-            cb.MoveTo(lineX, y+ titleHeight);
+            cb.MoveTo(lineX, y + titleHeight);
             cb.LineTo(lineX, y - height + titleHeight);
             cb.Stroke();
 
-            // Sol kısmı 11 eşit parçaya böl ve her satır arasına çizgi ekle
             float leftSectionHeight = height - titleHeight;
             float rowHeight = leftSectionHeight / 11;
-
-            int letterIndex = 0; // Harf dizisindeki ilerlemeyi izlemek için
+            int letterIndex = 0;
 
             for (int i = 1; i <= 11; i++)
             {
                 float currentY = y - i * rowHeight;
-
-                // Satırın rengini ayarla (şeritli desen)
                 bool isBlueBackground = i % 2 == 0;
 
                 if (isBlueBackground)
-                {
-                    cb.SetRGBColorFill(blueBackgroundColor[0], blueBackgroundColor[1], blueBackgroundColor[2]); // Açık Mavi
-                }
+                    cb.SetRGBColorFill(blueBackgroundColor[0], blueBackgroundColor[1], blueBackgroundColor[2]);
                 else
-                {
-                    cb.SetRGBColorFill(whiteBackgroundColor[0], whiteBackgroundColor[1], whiteBackgroundColor[2]); // Beyaz
-                }
+                    cb.SetRGBColorFill(whiteBackgroundColor[0], whiteBackgroundColor[1], whiteBackgroundColor[2]);
 
                 cb.Rectangle(x, currentY, columnDistance, rowHeight);
                 cb.Fill();
 
-                cb.SetLineWidth(lineWidth);  // Satır arası çizgiler için de global çizgi kalınlığını kullan
+                cb.SetLineWidth(lineWidth);
                 cb.MoveTo(x, currentY);
-                cb.LineTo(lineX, currentY); // Çizgiyi sadece sol kısım boyunca çiz
+                cb.LineTo(lineX, currentY);
                 cb.Stroke();
 
-                // Sadece açık mavi arka plana sahip satırlara daire ve harf ekle
                 if (isBlueBackground && letterIndex < letters.Length)
                 {
-                    // Daireyi çiz
                     float circleX = x + columnDistance / 2;
                     float circleY = currentY + rowHeight / 2;
-
-                    cb.SetLineWidth(circleLineWidth); // Dairenin çizgi kalınlığını ayarla
-                    cb.Circle(circleX, circleY, circleRadius); // Yarıçap
+                    cb.SetLineWidth(circleLineWidth);
+                    cb.Circle(circleX, circleY, circleRadius);
                     cb.Stroke();
 
-                    // Dairenin sağ tarafına ilgili harfi ekle (sırasıyla A, B, C, D, E)
-                    string letter = letters[letterIndex]; // Harfi seç
-                    float textX = circleX + circleRadius; // Daireden sağa
-                    float textY = circleY - (circleFontSize / 2); // Yazıyı dairenin ortasında hizalamak için küçük bir ofset
-
-                    cb.SetRGBColorFill(blackColor[0], blackColor[1], blackColor[2]); // Siyah renk
+                    string letter = letters[letterIndex];
+                    float textX = circleX + circleRadius;
+                    float textY = circleY - (circleFontSize / 2);
+                    cb.SetRGBColorFill(blackColor[0], blackColor[1], blackColor[2]);
 
                     cb.BeginText();
                     cb.ShowTextAligned(PdfContentByte.ALIGN_LEFT, letter, textX, textY, 0);
                     cb.EndText();
 
-                    letterIndex++; // Sonraki harfe geç
+                    letterIndex++;
                 }
             }
 
-            // Sağ kısmı 5 eşit parçaya böl ve her parçanın arka planını beyaz yap
+            // 🔹 **Sağ Kısım Hücreleri**
             float rightSectionHeight = height - titleHeight;
             float rightRowHeight = rightSectionHeight / rightsidecell;
             float rightX = x + width - rightSectionWidth;
@@ -156,24 +132,27 @@ namespace OptikProjeTumSayfa
             for (int i = 1; i <= 5; i++)
             {
                 float currentY = y - i * rightRowHeight;
-
-                cb.SetRGBColorFill(whiteBackgroundColor[0], whiteBackgroundColor[1], whiteBackgroundColor[2]); // Beyaz arka plan
+                cb.SetRGBColorFill(whiteBackgroundColor[0], whiteBackgroundColor[1], whiteBackgroundColor[2]);
                 cb.Rectangle(rightX, currentY, rightSectionWidth, rightRowHeight);
                 cb.Fill();
 
-                cb.SetLineWidth(lineWidth);  // Satır arası çizgiler için de global çizgi kalınlığını kullan
+                cb.SetLineWidth(lineWidth);
                 cb.MoveTo(rightX, currentY);
-                cb.LineTo(x + width, currentY); // Çizgiyi sağ kısım boyunca çiz
+                cb.LineTo(x + width, currentY);
                 cb.Stroke();
             }
 
-            // 1.4 cm ile 0.9 cm'lik alanları ayıran orta çizgiyi ekle
+            // 🔹 **Orta Çizgi (Kitapçık Türü ile Gözetmen Paraf Ayrımı)**
             float middleX = lineX + (rightX - lineX) / 2;
-            cb.SetLineWidth(middleLineWidth); // Çizgi kalınlığını tekrar ayarla
+            cb.SetLineWidth(middleLineWidth);
             cb.MoveTo(middleX, y);
             cb.LineTo(middleX, y - height + titleHeight);
             cb.Stroke();
         }
+
+
+
+
 
         private void AddTitle(PdfContentByte cb, float x, float y, float width, float height, string titleTop, string titleBottom)
         {
@@ -201,20 +180,7 @@ namespace OptikProjeTumSayfa
             cb.SetRGBColorStroke(blackColor[0], blackColor[1], blackColor[2]); // Siyah renk
             cb.SetLineWidth(lineWidth); // Kenarlık kalınlığı başlık için de global değişkenle ayarlandı
 
-            // Üst kenarlık
-            cb.MoveTo(x, y);
-            cb.LineTo(x + width, y);
-            cb.Stroke();
-
-            // Sol kenarlık
-            cb.MoveTo(x, y);
-            cb.LineTo(x, y - height);
-            cb.Stroke();
-
-            // Sağ kenarlık
-            cb.MoveTo(x + width, y);
-            cb.LineTo(x + width, y - height);
-            cb.Stroke();
+           
         }
 
     }
