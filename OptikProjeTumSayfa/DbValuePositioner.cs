@@ -14,8 +14,13 @@ namespace OptikProjeTumSayfa
         private string sınavAdi;
         private string sınavTarih;
         private readonly iTextSharp.text.Rectangle pageSize = PageSize.A4;
-        private int StudentID = 6; // Varsayılan bir öğrenci ID'si, gerektiğinde değiştirebilirsiniz.
+        private int StudentID; // Burayı artık dışarıdan alacağız.
 
+        public DbValuePositioner(int studentId)
+        {
+            this.StudentID = studentId; // Dışarıdan gelen ID'yi kullan.
+            cellHeight = tableHeight / rows; // Hücre yüksekliğini hesapla
+        }
 
         private int studentIndexData = 0; // Öğrenci bilgileri için sayaç
 
