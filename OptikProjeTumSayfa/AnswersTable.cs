@@ -37,9 +37,9 @@ namespace OptikProjeTumSayfa
         private float circleRadius = 4.5f;                                                                                        // Yuvarlakların yarıçapı
         private float columnSpacing = 3f;                                                                                         // Sütunlar arası boşluk
         private float choiceSpacing = 11.5f;                                                                                      // Şıklar arası boşluk
-        private BaseFont titleFont = BaseFont.CreateFont(BaseFont.HELVETICA_BOLD, "Cp1254", BaseFont.NOT_EMBEDDED);        // Başlık yazı tipi
+        private BaseFont titleFont = BaseFont.CreateFont(BaseFont.HELVETICA_BOLD, "Cp1254", BaseFont.NOT_EMBEDDED);               // Başlık yazı tipi
         private int titleFontSize = 10;                                                                                           // Başlık yazı tipi boyutu
-        private BaseFont questionFont = BaseFont.CreateFont(BaseFont.HELVETICA, "Cp1254", BaseFont.NOT_EMBEDDED);          // Soru yazı tipi
+        private BaseFont questionFont = BaseFont.CreateFont(BaseFont.HELVETICA, "Cp1254", BaseFont.NOT_EMBEDDED);                  // Soru yazı tipi
         private int questionFontSize = 5;                                                                                         // Soru yazı tipi boyutu
         private float questionNumberOffsetX = 2f;                                                                                 // X ekseninde soru numarası ofseti
         private float questionNumberOffsetY = -3f;                                                                                // Y ekseninde soru numarası ofseti

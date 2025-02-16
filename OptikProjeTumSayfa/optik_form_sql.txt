@@ -1,0 +1,69 @@
+﻿CREATE TABLE students (
+    StudentID INT AUTO_INCREMENT PRIMARY KEY,
+    TCKN CHAR(11) NOT NULL,
+    Name VARCHAR(100) NOT NULL,
+    StudentNumber CHAR(8) NOT NULL CHECK (StudentNumber REGEXP '^[0-9]{8}$'),
+    DepartmentID INT NOT NULL,
+    ExampleDetailsID INT,
+    ExampleTitleID INT,
+    FOREIGN KEY (DepartmentID) REFERENCES departments(DepartmentID),
+    FOREIGN KEY (ExampleDetailsID) REFERENCES examdetails(ID),
+    FOREIGN KEY (ExampleTitleID) REFERENCES examtitles(ID)
+);
+
+
+CREATE TABLE examtitles (
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    DepartmentName VARCHAR(100) NOT NULL,
+    RoomNumber INT NOT NULL,
+    SeatNumber INT NOT NULL
+);
+
+CREATE TABLE departments (
+    DepartmentID INT AUTO_INCREMENT PRIMARY KEY,
+    DepartmentName VARCHAR(100) NOT NULL
+);
+
+
+CREATE TABLE examdetails (
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    ExamName VARCHAR(100) NOT NULL,
+    ExamDate DATE NOT NULL
+);
+
+
+
+
+
+
+
+INSERT INTO students (TCKN, Name, StudentNumber, DepartmentID, ExampleDetailsID, ExampleTitleID) VALUES
+('11111111111', 'Ali Veli', '12345678', 1, 1, 1),
+('22222222222', 'Ayşe Fatma', '87654321', 2, 2, 2),
+('33333333333', 'Mehmet Can', '11223344', 2, 3, 3),
+('44444444444', 'Zeynep Kaya', '44332211', 3, 1, 1),
+('55555555555', 'Ahmet Demir', '55667788', 3, 2, 2),
+('66666666666', 'Elif Yılmaz', '33445566', 1, 3, 3);
+
+
+INSERT INTO examdetails (ExamName, ExamDate) VALUES
+('Math Exam', '2025-01-10'),
+('Physics Exam', '2025-01-15'),
+('Chemistry Exam', '2025-01-20');
+
+
+INSERT INTO examtitles (DepartmentName, RoomNumber, SeatNumber) VALUES
+('Engineering', 101, 1),
+('Engineering', 102, 2),
+('Science', 201, 1),
+('Science', 202, 2),
+('Arts', 301, 1),
+('Arts', 302, 2);
+
+
+
+INSERT INTO departments (DepartmentName) VALUES
+('Engineering'),
+('Science'),
+('Arts');
+
