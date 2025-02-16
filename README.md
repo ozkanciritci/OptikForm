@@ -39,9 +39,5 @@
 3. PDF dosyası belirtilen dizine kaydedilecektir.
 4. PDF içerisinde **öğrenci bilgileri, kitapçık türü, cevap alanı, kimlik numarası gibi bölümler otomatik olarak oluşturulacaktır.**
 
-## Katkıda Bulunma
-Proje geliştirmelerine katkıda bulunmak isterseniz, pull request gönderebilir veya hata bildiriminde bulunabilirsiniz.
 
-## Lisans
-Bu proje açık kaynaklıdır ve MIT lisansı altında dağıtılmaktadır.
 
