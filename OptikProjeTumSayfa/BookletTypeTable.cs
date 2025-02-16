@@ -49,7 +49,7 @@ namespace OptikProjeTumSayfa
             float remainingHeight = height - titleHeight;
             float cellHeight = remainingHeight / leftrows;
 
-            // 📌 **Dış Kenarlıkları Tek Seferde Çiziyoruz**
+            //Dış Kenarlıkları  Çiziyoruz
             cb.SetLineWidth(borderLineWidth);
             cb.Rectangle(x, y - height, width, height);
             cb.Stroke();
@@ -61,21 +61,21 @@ namespace OptikProjeTumSayfa
             float rightTitleX = x + columnDistance;
             AddTitle(cb, rightTitleX, y, width - columnDistance, titleHeight, tableNames["rightTitle"][0], tableNames["rightTitle"][1]);
 
-            // 🔹 **Başlıkların Altına Siyah Çizgi Ekliyoruz**
+            //Başlıkların Altına Siyah Çizgi Ekliyoruz
             float bottomTitleY = y - titleHeight;
             cb.SetLineWidth(lineWidth);
             cb.MoveTo(x, bottomTitleY);
             cb.LineTo(x + width, bottomTitleY);
-            cb.Stroke(); // 📌 **Bu Çizgi Mavi Alan ile Beyaz Alanı Ayırıyor!**
+            cb.Stroke(); //Bu Çizgi Mavi Alan ile Beyaz Alanı Ayırıyor!
 
-            // 🔹 **İç Çizgileri Çiz**
+            //İç Çizgileri Çiz**
             cb.SetLineWidth(lineWidth);
             BaseFont bf = BaseFont.CreateFont(BaseFont.HELVETICA, "Cp1254", BaseFont.NOT_EMBEDDED);
             cb.SetFontAndSize(bf, circleFontSize);
 
             y -= titleHeight;
 
-            // 🔹 **Orta Çizgi (Sol ve Sağ Tabloyu Ayıran Çizgi)**
+            // Orta Çizgi (Sol ve Sağ Tabloyu Ayıran Çizgi)
             float lineX = x + columnDistance;
             cb.MoveTo(lineX, y + titleHeight);
             cb.LineTo(lineX, y - height + titleHeight);
@@ -124,7 +124,7 @@ namespace OptikProjeTumSayfa
                 }
             }
 
-            // 🔹 **Sağ Kısım Hücreleri**
+            // Sağ Kısım Hücreleri**
             float rightSectionHeight = height - titleHeight;
             float rightRowHeight = rightSectionHeight / rightsidecell;
             float rightX = x + width - rightSectionWidth;
@@ -142,7 +142,7 @@ namespace OptikProjeTumSayfa
                 cb.Stroke();
             }
 
-            // 🔹 **Orta Çizgi (Kitapçık Türü ile Gözetmen Paraf Ayrımı)**
+            //Orta Çizgi (Kitapçık Türü ile Gözetmen Paraf Ayrımı)
             float middleX = lineX + (rightX - lineX) / 2;
             cb.SetLineWidth(middleLineWidth);
             cb.MoveTo(middleX, y);

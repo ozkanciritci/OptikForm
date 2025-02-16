@@ -86,13 +86,7 @@ namespace OptikProjeTumSayfa
             }
         }
        
-        //public  int xGetir(int sayi)
-        //{
-        //    sayi = 1+ 80;
-        //    return sayi;
-        //}
-
-        // Tablo çizme fonksiyonu (parametre olarak öğrenci isimleri ve tablo ölçüleri alıyor)
+     
         private void DrawCustomTable(PdfContentByte cb, float x, float y, float width, float height, string[] studentInformation, int rows)
         {
 
@@ -143,11 +137,6 @@ namespace OptikProjeTumSayfa
                    
                 }
             }
-
-           
-
-            
-          
 
 
 

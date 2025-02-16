@@ -40,8 +40,7 @@ namespace OptikProjeTumSayfa
             DbConnection db = new DbConnection();
             using (MySqlConnection connection = db.GetConnection())
             {
-                Console.WriteLine("Kullanılan StudentID: " + StudentID); // Debug için
-
+                Console.WriteLine("Kullanılan StudentID: " + StudentID);
                 studentsInformationDataBase = FetchStudentData(connection);
                 titles = FetchTitles(connection);
 

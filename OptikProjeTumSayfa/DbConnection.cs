@@ -12,7 +12,7 @@ namespace OptikProjeTumSayfa
 
         public DbConnection()
         {
-            // App.config dosyasından bağlantı dizesini al
+            
             connectionString = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
         }
 
@@ -81,8 +81,6 @@ namespace OptikProjeTumSayfa
 
 
 
-
-        // Bağlantı nesnesi döndüren bir metot
         public MySqlConnection GetConnection()
         {
             var connection = new MySqlConnection(connectionString);

@@ -43,13 +43,13 @@ namespace OptikProjeTumSayfa
 
             this.Controls.Add(btnCreatePdf);
 
-            // 📌 Yeni butonu oluştur
+            // Yeni butonu oluştur
             Button btnCreateSinglePdf = new Button();
             btnCreateSinglePdf.Text = "Tek PDF Oluştur";
             btnCreateSinglePdf.Location = new Point(120, 10); // Butonun konumunu ayarla
             btnCreateSinglePdf.Click += button2_Click; // Yeni butonun event'ini tanımla
 
-            // 📌 Butonu forma ekle
+            // Butonu forma ekle
             this.Controls.Add(btnCreateSinglePdf);
 
         }
@@ -173,38 +173,38 @@ namespace OptikProjeTumSayfa
                 return;
             }
 
-            // 📌 Tek bir PDF için dosya yolu
-            string filePath = Path.Combine(@"C:\Users\Ozkan\Desktop\", "Toplu_OptikForm.pdf");
+            //Tek bir PDF için dosya yolu
+            string filePath = Path.Combine(@"C:\Users\Ozkan\Desktop\", "Toplu_OptikForm.pdf");//yol global olarak ayarlanmalı
 
-            // 📌 Geçici olarak her öğrenci için oluşturulacak PDF'lerin listesi
+            // Geçici olarak her öğrenci için oluşturulacak PDF'lerin listesi
             List<string> tempFiles = new List<string>();
 
             try
             {
                 DbConnection db = new DbConnection();
 
-                // 1️⃣ **Her öğrenci için ayrı PDF oluşturup, tabloları ekleyerek geçici dosyalara kaydediyoruz**
+                // Her öğrenci için ayrı PDF oluşturup, tabloları ekleyerek geçici dosyalara kaydediyoruz
                 foreach (int studentId in selectedStudentIds)
                 {
                     string studentName = GetStudentNameById(db, studentId);
                     string tempFilePath = Path.Combine(Path.GetTempPath(), $"{studentId}.pdf");
                     tempFiles.Add(tempFilePath);
 
-                    // 📌 Yeni bir öğrenci PDF oluştur
+                    // Yeni bir öğrenci PDF oluştur
                     DbValuePositioner studentPdf = new DbValuePositioner(studentId);
                     studentPdf.CreatePdf(tempFilePath);
 
-                    // 📌 **Ek tabloları bu PDF'ye ekle**
+                    // Ek tabloları bu PDF'ye ekle**
                     AddNumberedTableToExistingPdf(tempFilePath);
                     AddNotTakeExamPdf(tempFilePath);
                     AddAttentionPdf(tempFilePath);
                     AddExamplePdf(tempFilePath);
                     AddStudentInformatinTablePdf(tempFilePath);
                     AddDbInformationPdf(tempFilePath);
-                    AddAnswersTableToPdf(tempFilePath); // 📌 **AnswersTable'ı ekliyoruz**
+                    AddAnswersTableToPdf(tempFilePath); //AnswersTable'ı ekliyoruz**
                 }
 
-                // 2️⃣ **Tek bir PDF dosyası oluşturup tüm PDF'leri içine ekleyelim**
+                // Tek bir PDF dosyası oluşturup tüm PDF'leri içine ekleyelim**
                 using (FileStream fs = new FileStream(filePath, FileMode.Create, FileAccess.Write))
                 using (Document doc = new Document(PageSize.A4))
                 using (PdfCopy writer = new PdfCopy(doc, fs)) // **PdfWriter yerine PdfCopy kullanıyoruz!**
