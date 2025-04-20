@@ -1,4 +1,6 @@
-﻿CREATE TABLE students (
+﻿CREATE DATABASE optikformdbv2;
+
+CREATE TABLE students (
     StudentID INT AUTO_INCREMENT PRIMARY KEY,
     TCKN CHAR(11) NOT NULL,
     Name VARCHAR(100) NOT NULL,
